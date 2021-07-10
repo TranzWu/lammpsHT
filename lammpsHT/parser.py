@@ -1,4 +1,4 @@
-from layerParser import Layer
+from lammpsHT.layerParser import Layer
 
 
 class Parser():
@@ -18,6 +18,13 @@ class Parser():
 				return int(clean[1])
 	
 	@property
+	def filename(self):
+		for line in self.text:
+			if 'Filename' in line:
+				clean = line.split()
+				return clean[1]
+
+	@property
 	def layers(self):
 		Layers = []
 		start = [idx for idx, line in enumerate(self.text) if "START" in line]
@@ -35,5 +42,6 @@ class Parser():
 
 
 if __name__ == '__main__':
+
 	parser = Parser('auto.in')
-	print(parser.layers)
+	print(parser.filename)

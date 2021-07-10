@@ -1,3 +1,4 @@
+
 class Line():
 	def __init__(self, input):
 		self.input = input
@@ -41,4 +42,4 @@ if __name__ == '__main__':
 	 '        parameter [-0.5, -1.0, -1.5, -2, -2.5, -3]  \n', 
 	 '\n']
 	line = Line(inp)
-	print(line.index)
+	print(line.parameter)

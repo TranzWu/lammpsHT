@@ -1,11 +1,13 @@
 #The information required to generate automization code
 
-N_layers 2 
+Filename hole.in
+N_layers 2
+n_jobs 8
+core 4 
 
 N = 1 START
 
     N_ensemble = 5
-    Parallel False
 
     Line bulk1 1
         index 4

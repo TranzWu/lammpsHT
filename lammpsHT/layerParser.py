@@ -1,4 +1,4 @@
-from lineParser import Line
+from lammpsHT.lineParser import Line
 
 class Layer():
 	def __init__(self, inp):
@@ -34,9 +34,13 @@ class Layer():
 	def Nlines(self):
 		return len(self.lines)
 
+	def write_to_file(self):
+		return 
+
 	
 
 if __name__ == '__main__':
+
 	inp = ['N = 1 START\n', '\n', 'N_ensemble = 6\n',
 	'    Line pressure 1\n', 
 	'        index 5\n', 
