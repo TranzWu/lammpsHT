@@ -1,3 +1,4 @@
+from lineParser import Line
 
 class Layer():
 	def __init__(self, inp):
@@ -25,8 +26,13 @@ class Layer():
 
 		for i in range(nlines):
 			line = self.input[start[i]:end[i]]
-		return line
+			line = Line(line)
+			Lines.append(line)
+		return Lines
 		
+	@property
+	def Nlines(self):
+		return len(self.lines)
 
 	
 
@@ -40,5 +46,5 @@ if __name__ == '__main__':
 	'\n']
 
 	layer =  Layer(inp)
-	print(layer.lines)
+	print(layer.Nlines)
 
