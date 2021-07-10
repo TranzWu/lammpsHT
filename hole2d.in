@@ -1,0 +1,111 @@
+#basic settings
+
+dimension 2
+boundary p p p
+atom_style full
+lattice hex 1
+region box block 0 50 0 50 -0.2 0.2
+create_box 4 box bond/types 2 extra/bond/per/atom 4
+
+mass 1 1.0
+mass 2 1.0
+mass 3 1.0
+mass 4 1.0
+
+#bulk fluid atoms
+region bulk block INF INF 5 11 INF INF
+create_atoms 4 random 500 5056 bulk #@@bulk
+
+#lid
+region lid block INF INF 11.5 11.6 INF INF
+create_atoms 1 region lid units lattice
+
+#upper channel
+region channel1 block INF INF 4.4 4.5 INF INF
+create_atoms 2 region channel1 units lattice
+
+#interior fluid
+region interior block INF INF 2.5 3.0 INF INF
+create_atoms 3 random 50 5699 interior #@@interior
+
+#lower channel
+region channel2 block INF INF 2 2.1 INF INF
+create_atoms 2 region channel2 units lattice
+
+#hole_up
+region void1 sphere 1 4.4 0 4 #@@hole
+#delete_atoms region void1
+
+#hole_down
+region void2 sphere 20.0 1.9 0 2.0 #@@hole_down
+#delete_atoms region void2
+
+#define groups
+
+group lid type 1
+group channel1 region channel1
+group channel2 region channel2
+group bulk region bulk
+
+#pair potential
+
+pair_style lj/cut 2.5
+pair_coeff 1 1 1.0 1.0
+pair_coeff 2 2 1.0 1.0
+pair_coeff 3 3 1.0 1.0
+pair_coeff 4 4 1.0 1.0
+
+
+#create_bonds many channel channel 1 1 1.1
+
+bond_style harmonic
+bond_coeff 1 300 0.86
+bond_coeff 2 300 0.86
+
+#create_bonds many channel1 channel1 1 0.8 1
+create_bonds many lid lid 1 1 1.1
+velocity lid set 0.0 0.0 0.0
+velocity channel1 set 0 0 0
+velocity channel2 set 0 0 0
+#velocity bulk set 1 1 0
+
+#fix command
+fix fc channel1 setforce 0.0 0.0 0.0
+fix 3 channel2 setforce 0.0 0.0 0.0
+fix 2 lid setforce 0.0 0.0 0.0
+minimize 1.0e-4 1.0e-6 100 1000
+unfix 2
+timestep 0.003
+thermo 200
+dump 1 all atom 100 dump.crack
+
+reset_ids
+velocity bulk create 1 6157 #@@velocity_set
+
+#fix
+fix 2 lid addforce 0.0 -1.0 0 #@@pressure
+log nve.out
+fix 1 all nve
+
+
+#run
+run 150000
+unfix 1
+unfix fc
+
+fix fc channel1 setforce 0 NULL 0
+
+delete_atoms region void1
+delete_atoms region void2
+create_bonds many channel1 channel1 1 1 1.1
+
+#compute cc1 all chunk/atom molecule region hydro
+#compute myChunk all msd/chunk cc1
+
+
+fix 1 all nve
+
+
+thermo_modify lost ignore
+
+run 750000

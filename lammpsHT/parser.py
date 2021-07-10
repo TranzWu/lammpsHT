@@ -35,8 +35,10 @@ class Parser():
 
 		for i in range(self.Nlayers):
 			layer = self.text[start[i]:end[i]]
+			layer = Layer(layer)
+			Layers.append(layer)
 
-		return layer
+		return Layers
 
 
 
