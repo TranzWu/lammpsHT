@@ -25,14 +25,46 @@ class Line():
 				idx.append(int(clean[1]))
 		return idx
 
+	def clean_indentation(self, raw):
+		assert(type(raw) == str)
+		#count how many times ' ' appear before
+		count = 0
+		for i in raw:
+			if i == ' ':
+				count += 1
+			else:
+				break
+		return raw.replace(' ', '', count)
+
+	
+	def clean_blanks(self, raw):
+		assert(type(raw) == str)
+		idx = 0
+		l = len(raw)
+		for i in range(1, l+1):
+			if raw[-i] == '\n' or raw[-i] == ' ':
+				idx -= 1
+			else:
+				break
+		if idx:
+			return raw[:idx]
+		else:
+			return raw[:]
+
+	def reformat(self, raw):
+		return self.clean_blanks(self.clean_indentation(raw))
+
+
 	@property
 	def parameter(self):
 		prms = []
 		for line in self.input:
 			if 'parameter' in line:
 				clean = line.split('parameter')
-				prms.append(clean[1])
+				prms.append(self.reformat(clean[1]))
 		return prms
+
+
 	
 
 if __name__ == '__main__':
