@@ -9,6 +9,11 @@ N = 1 START
 
     N_ensemble = 5
 
+    PRE 
+        mkdir results
+    END pre
+
+
     Line bulk1 1
         index 4
         parameter random
@@ -24,6 +29,14 @@ N = 1 START
         parameter random
     END line
 
+
+    POST
+        calculate.py --output result_{k}
+        mv result_* results
+    END post
+
+
+
     
 END layer
 
@@ -31,7 +44,7 @@ N = 2 START
 
     Line pressure 1
         index 5
-        parameter [-0.5, -1.0, -1.5, -2, -2.5, -3]  
+        parameter [-0.5, -1.0, -1.5, -2, -2.5, -3] 
 
     END line
 

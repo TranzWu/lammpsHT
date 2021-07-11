@@ -34,6 +34,56 @@ class Layer():
 	def Nlines(self):
 		return len(self.lines)
 
+	@property
+	def pre(self):
+		if self.isFirst:
+			for idx, line in enumerate(self.input):
+				if 'PRE' in line:
+					start = idx
+				if 'END pre' in line:
+					end = idx
+			return self.input[start+1: end]
+	
+	@property
+	def post(self):
+		if self.isFirst:
+			for idx, line in enumerate(self.input):
+				if 'POST' in line:
+					start = idx
+				if 'END post' in line:
+					end = idx
+			return self.input[start+1: end]
+
+	def clean_indentation(self, raw):
+		assert(type(raw) == str)
+		#count how many times ' ' appear before
+		count = 0
+		for i in raw:
+			if i == ' ':
+				count += 1
+			else:
+				break
+		return raw.replace(' ', '', count)
+
+	
+	def clean_blanks(self, raw):
+		assert(type(raw) == str)
+		idx = 0
+		l = len(raw)
+		for i in range(1, l+1):
+			if raw[-i] == '\n' or raw[-i] == ' ':
+				idx -= 1
+			else:
+				break
+		if idx:
+			return raw[:idx]
+		else:
+			return raw[:]
+
+	def reformat(self, raw):
+		return self.clean_blanks(self.clean_indentation(raw))
+
+
 	def write_to_file(self):
 		return 
 
