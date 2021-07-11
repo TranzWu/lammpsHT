@@ -1,8 +1,9 @@
 from lammpsHT.lineParser import Line
 
 class Layer():
-	def __init__(self, inp):
+	def __init__(self, inp, filename):
 		self.input = inp
+		self.filename = filename
 
 	@property
 	def isFirst(self):
