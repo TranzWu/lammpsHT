@@ -2,12 +2,12 @@
 
 Filename hole.in
 N_layers 2
-n_jobs 8
-core 4 
 
 N = 1 START
 
     N_ensemble = 5
+    cores = 4
+    njobs = 5
 
     PRE 
         mkdir results

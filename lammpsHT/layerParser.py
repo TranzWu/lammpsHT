@@ -1,4 +1,5 @@
 from lammpsHT.lineParser import Line
+import pathlib
 
 class Layer():
 	def __init__(self, inp, filename):
@@ -19,8 +20,24 @@ class Layer():
 		if self.isFirst:
 			line = [i for i in self.input if "N_ensemble" in i]
 			clean = line[0].split()
-			return int(clean[-1])
+			return int(clean[2])
 	
+	@property
+	def njobs(self):
+		for line in self.input:
+			if 'njobs' in line:
+				clean = line.split()
+				return int(clean[2])
+	
+	@property
+	def cores(self):
+		for line in self.input:
+			if 'cores' in line:
+				clean = line.split()
+				return int(clean[2])
+
+	
+
 	@property
 	def lines(self):
 		Lines = []
@@ -59,6 +76,14 @@ class Layer():
 				if 'END post' in line:
 					end = idx
 			return self.input[start+1: end]
+			
+
+	def write_first_layer(self):
+		path = str(pathlib.Path(__file__).parent)
+		path = f"{path}/template/parallel_template.py"
+		with open(path, 'r') as f:
+			rad = f.readlines()
+		return rad
 
 
 	def write_to_file(self):
