@@ -13,11 +13,11 @@ njobs = 5
 os.system('mkdir results')
 def run(k):
     #insert code here
-    os.system('python change_parameter.py --input auto.in --line velocity_placeolder --index 4 --new random')
-    os.system('python change_parameter.py --input auto.in --line interior --index 4 --new random')
-    os.system('python change_parameter.py --input auto.in --line bulk --index 4 --new random')
-    os.system(f'mpirun --oversubscribe -np {cores} lmp_mpi -in auto.in > output.lammps') 	os.system("change_parameter.py --input hole.in --line hole --index "3 4" --new " + new)
+    os.system('change_parameter.py --input auto.in --line velocity_placeolder --index 4 --new random')
+    os.system('change_parameter.py --input auto.in --line interior --index 4 --new random')
+    os.system('change_parameter.py --input auto.in --line bulk --index 4 --new random')
+    os.system(f'mpirun --oversubscribe -np {cores} lmp_mpi -in auto.in > output.lammps')
     #insert post-processing
-    os.system('calculate.py --output result_{k}')
-    os.system('mv result_* results')
+    os.system(f'calculate.py --output result_{k}')
+    os.system(f'mv result_* results')
 Parallel(n_jobs=jobs)(delayed(run)(i) for i in range(N))

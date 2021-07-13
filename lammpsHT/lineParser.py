@@ -61,7 +61,10 @@ class Line():
 		for line in self.input:
 			if 'parameter' in line:
 				clean = line.split('parameter')
-				prms.append(self.reformat(clean[1]))
+				if 'random' in clean[1]:
+					prms.append(self.reformat(clean[1]))
+				else:
+					prms.append(eval(self.reformat(clean[1])))
 		return prms
 
 

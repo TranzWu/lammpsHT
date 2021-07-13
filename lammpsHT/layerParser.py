@@ -14,7 +14,7 @@ class Layer(Line):
 	@property
 	def index(self):
 		clean = self.input[0].split()
-		return clean[2]
+		return int(clean[2])
 
 	def key_value(self, k):
 		for line in self.input:
@@ -26,6 +26,8 @@ class Layer(Line):
 	def N_ensemble(self):
 		if self.isFirst:
 			return self.key_value('N_ensemble')
+		else:
+			return len(self.lines[0].parameter[0])
 	
 	@property
 	def njobs(self):
@@ -81,6 +83,8 @@ class Layer(Line):
 					end = idx
 			raw =  self.input[start+1: end]
 			return [self.reformat(line) for line in raw]
+		else:
+			return [f'layer_{self.index - 1}.py']
 			
 	@property
 	def template_path(self):
@@ -106,9 +110,13 @@ class Layer(Line):
 			ist = idx + 1
 			if "insert parameters" in line:
 				text.insert(ist, f"njobs = {self.njobs}\n")
+				text.insert(ist, f"N_ensemble = {self.N_ensemble}\n")
 				if self.isFirst:
 					text.insert(ist, f"cores = {self.cores}\n")
-					text.insert(ist, f"N_ensemble = {self.N_ensemble}\n")
+				else:
+					for i, line in enumerate(self.lines):
+						text.insert(ist, f"line_{i} = {line.parameter}\n")
+
 				if self.use_template:
 					text.insert(ist, f"template_path = {self.template_path}\n")
 		return text
@@ -130,8 +138,17 @@ class Layer(Line):
 			if "insert post" in line:
 				count_post = idx + 1
 				for p in self.post:
-					text.insert(count_post, f"{b}os.system('{p}')\n")
+					text.insert(count_post, f"{b}os.system(f'{p}')\n")
 					count_post += 1
+		return text
+
+	def write_preheat(self, raw):
+		text = raw[:]
+		b = '    '
+		for idx, line in enumerate(raw):
+			if 'insert preheat' in line:
+				count_heat = idx + 1
+				text.insert(count_heat, f"{b}os.system(f'mkdir {{k}}')\n")
 		return text
 
 	def write_code_run(self, raw):
@@ -141,29 +158,38 @@ class Layer(Line):
 			if "insert code" in line:
 				count_code = idx + 1
 				b = '    '
-				for l in self.lines:
+				for ii, l in enumerate(self.lines):
 					for i in range(l.NParameter):
 
 						if self.use_template:
-							temp = "{template_path}"
+							temp = "python {template_path}"
 						else:
 							temp = ''
 
-						cmd = f'python {temp}change_parameter.py '\
+						if self.isFirst:
+							new_prm = f"{l.parameter[i]}"
+						else:
+							new_prm = f"line_{ii}[{i}]"
+							new_prm = '{' + new_prm + '}'
+
+						cmd = f'{temp}change_parameter.py '\
 							  f'--input {self.filename} '\
 							  f'--line {l.identifier} '\
 							  f'--index {l.index[i]} '\
-							  f'--new {l.parameter[i]}'
-						  
-						cmd_wrap = f"{b}os.system('{cmd}')\n"
-						text.insert(idx + 1, cmd_wrap)
+							  f'--new {new_prm}'
+						if self.isFirst:  
+							cmd_wrap = f"{b}os.system('{cmd}')\n"
+						else:
+							cmd_wrap = f"{b}os.system(f'{cmd}')"
+						text.insert(idx + 1, f'{cmd_wrap}\n')
 						count_code += 1
+
 				if self.isFirst:
 					lmps_cmd = f'mpirun --oversubscribe '\
 							   '-np {cores} '\
 							   f'lmp_mpi -in {self.filename} > output.lammps'
 					lmps_wrap = f"{b}os.system(f'{lmps_cmd}')"
-					text.insert(count_code, lmps_wrap)
+					text.insert(count_code, f'{lmps_wrap}\n')
 		return text
 
 	def write_to_file(self):
@@ -171,13 +197,14 @@ class Layer(Line):
 		text = self.write_parameters(text)
 		if self.isFirst:
 			text = self.write_pre(text)
+		else:
+			text = self.write_preheat(text)
 		text = self.write_code_run(text)
-		if self.isFirst:
-			text = self.write_post(text)
+		text = self.write_post(text)
 		with open(self.output, 'w') as f:
 			for line in text:
 				f.write(line)
-		return text
+		return 
 
 	
 

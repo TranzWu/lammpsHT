@@ -8,7 +8,7 @@ import numpy as np
 #insert parameters here
 #insert pretreatment
 def run(k):
+    #insert preheat
     #insert code here
- 	os.system("change_parameter.py --input hole.in --line hole --index "3 4" --new " + new)
     #insert post-processing
-Parallel(n_jobs=jobs)(delayed(run)(i) for i in range(N))
+Parallel(n_jobs=njobs)(delayed(run)(i) for i in range(N_ensemble))
