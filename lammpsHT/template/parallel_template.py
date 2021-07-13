@@ -4,6 +4,7 @@ import os
 from os import system
 from joblib import Parallel, delayed
 import sys
+import numpy as np
 #inser parameters here
 #insert pretreatment
 def run(k):
