@@ -5,16 +5,17 @@ N_layers 2
 
 N = 1 START
 
-    N_ensemble = 5
-    cores = 4
-    njobs = 5
+    N_ensemble 5
+    cores 4
+    njobs 5
+    use_template 0
 
     PRE 
         mkdir results
     END pre
 
 
-    Line bulk1 1
+    Line bulk 1
         index 4
         parameter random
     END line
@@ -41,7 +42,7 @@ N = 1 START
 END layer
 
 N = 2 START
-
+    njobs 1
     Line pressure 1
         index 5
         parameter [-0.5, -1.0, -1.5, -2, -2.5, -3] 

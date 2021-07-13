@@ -35,7 +35,7 @@ class Parser():
 
 		for i in range(self.Nlayers):
 			layer = self.text[start[i]:end[i]]
-			layer = Layer(layer, filename=self.input)
+			layer = Layer(layer, filename=self.input, N_max=self.Nlayers)
 			Layers.append(layer)
 
 		return Layers

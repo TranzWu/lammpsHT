@@ -2,9 +2,10 @@ from lammpsHT.lineParser import Line
 import pathlib
 
 class Layer(Line):
-	def __init__(self, inp, filename):
+	def __init__(self, inp, filename, N_max):
 		self.input = inp
 		self.filename = filename
+		self.N_max = N_max
 
 	@property
 	def isFirst(self):
@@ -67,6 +68,8 @@ class Layer(Line):
 					end = idx
 			raw = self.input[start+1: end]
 			return [self.reformat(line) for line in raw]
+		else:
+			return []
 	
 	@property
 	def post(self):
@@ -84,60 +87,97 @@ class Layer(Line):
 		path = str(pathlib.Path(__file__).parent)
 		return f"{path}/template/"
 
+	@property
+	def output(self):
+		if self.index == self.N_max:
+			return "run_this.py"
+		else:
+			return f"layer_{self.index}.py"
+
 	def read_from_template(self):
 		path = f"{self.template_path}parallel_template.py"
 		with open(path, 'r') as f:
 			rad = f.readlines()
 		return rad
 
-	def write_parameters(self):
-		text = self.read_from_template()
-		for idx, line in enumerate(text):
+	def write_parameters(self, raw):
+		text = raw[:]
+		for idx, line in enumerate(raw):
+			ist = idx + 1
 			if "insert parameters" in line:
-				text.insert(idx, f"njobs = {self.njobs}")
+				text.insert(ist, f"njobs = {self.njobs}\n")
 				if self.isFirst:
-					text.insert(idx, f"cores = {self.cores}")
-					text.insert(idx, f"N_ensemble = {self.N_ensemble}")
+					text.insert(ist, f"cores = {self.cores}\n")
+					text.insert(ist, f"N_ensemble = {self.N_ensemble}\n")
 				if self.use_template:
-					text.insert(idx, f"template_path = {self.template_path}")
-	
-	def write_pretreatment(self):
-		for idx, line in enumerate(text):	
+					text.insert(ist, f"template_path = {self.template_path}\n")
+		return text
+
+	def write_pre(self, text):
+		raw = text[:]
+		for idx, line in enumerate(raw):	
 			if "insert pretreatment" in line:
-				count_pre = idx
+				count_pre = idx + 1
 				for p in self.pre:
-					text.insert(count_pre, p)
+					text.insert(count_pre, f"os.system('{p}')\n")
 					count_pre += 1
+		return text
+
+	def write_post(self, text):
+		raw = text[:]
+		b = "    "
+		for idx, line in enumerate(raw):	
+			if "insert post" in line:
+				count_post = idx + 1
+				for p in self.post:
+					text.insert(count_post, f"{b}os.system('{p}')\n")
+					count_post += 1
+		return text
 
 	def write_code_run(self, raw):
 		text = raw[:]
 
-		for idx, line in enumerate(text):
+		for idx, line in enumerate(raw):
 			if "insert code" in line:
-				count_code = idx
+				count_code = idx + 1
 				b = '    '
 				for l in self.lines:
 					for i in range(l.NParameter):
+
 						if self.use_template:
-							cmd = f'python {template_path}change_parameter.py '\
-								  f'--input {self.filename} '\
-								  f'--line {l.identifier} '\
-								  f'--index {l.index[i]} '\
-								  f'--new {l.parameter[i]}'\
-							  
-							cmd_wrap = f"{b}os.system('{cmd}')\n"
-							text.insert(idx, cmd_wrap)
-							count_code += 1
-		if self.isFirst:
-			lmps_cmd = f'mpirun --oversubscribe '\
-					   '-np {cores} '\
-					   f'lmp_mpi -in {self.filename} > output.lammps'\
-			lmps_wrap = f"{b}os.system(f'{lmps_cmd}')"
-			text.insert(count_code, lmps_wrap)
+							temp = "{template_path}"
+						else:
+							temp = ''
+
+						cmd = f'python {temp}change_parameter.py '\
+							  f'--input {self.filename} '\
+							  f'--line {l.identifier} '\
+							  f'--index {l.index[i]} '\
+							  f'--new {l.parameter[i]}'
+						  
+						cmd_wrap = f"{b}os.system('{cmd}')\n"
+						text.insert(idx + 1, cmd_wrap)
+						count_code += 1
+				if self.isFirst:
+					lmps_cmd = f'mpirun --oversubscribe '\
+							   '-np {cores} '\
+							   f'lmp_mpi -in {self.filename} > output.lammps'
+					lmps_wrap = f"{b}os.system(f'{lmps_cmd}')"
+					text.insert(count_code, lmps_wrap)
 		return text
 
 	def write_to_file(self):
-		return 
+		text = self.read_from_template()
+		text = self.write_parameters(text)
+		if self.isFirst:
+			text = self.write_pre(text)
+		text = self.write_code_run(text)
+		if self.isFirst:
+			text = self.write_post(text)
+		with open(self.output, 'w') as f:
+			for line in text:
+				f.write(line)
+		return text
 
 	
 
