@@ -115,7 +115,9 @@ class Layer(Line):
 					text.insert(ist, f"cores = {self.cores}\n")
 				else:
 					for i, line in enumerate(self.lines):
-						text.insert(ist, f"line_{i} = {line.parameter}\n")
+						for ii, prm in enumerate(line.parameter):
+							text.insert(ist, f"line_{i}_{ii} = {prm}\n")
+							ist += 1
 
 				if self.use_template:
 					text.insert(ist, f"template_path = {self.template_path}\n")
@@ -175,8 +177,7 @@ class Layer(Line):
 						if self.isFirst:
 							new_prm = f"{l.parameter[i]}"
 						else:
-							new_prm = f"line_{ii}[{i}]"
-							new_prm = '{' + new_prm + '}'
+							new_prm = f"line_{ii}_{i}[{{k}}]"
 
 						cmd = f'{temp}change_parameter.py '\
 							  f'--input {self.filename} '\

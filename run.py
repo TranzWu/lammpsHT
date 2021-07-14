@@ -1,6 +1,5 @@
 from lammpsHT.parser import Parser
+import sys
 
-
-
-parser = Parser('auto.in')
+parser = Parser(f"auto.in")
 parser.write_all()

@@ -49,6 +49,13 @@ N = 2 START
         parameter [-0.2, -1.0, -1.5, -2, -2.5, -3]
     END line
 
+    Line random_stuff 2
+        index 4
+        parameter [-0.3, -1.0, -1.5, -2, -2.5, -3] 
+        index 7
+        parameter [-0.4, -1.0, -1.5, -2, -2.5, -3] 
+    END line
+
 END layer
 
 N = 3 START
