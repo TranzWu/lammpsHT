@@ -154,7 +154,7 @@ class Layer(Line):
 				count_heat += 1
 				text.insert(count_heat, f"{b}os.system(f'cp {self.filename} layer_* run_this {{k}}')\n")
 				count_heat += 1
-				text.insert(count_heat, f"{b}os.chdir({{k}})\n")
+				text.insert(count_heat, f"{b}os.chdir(f'{{k}}')\n")
 		return text
 
 	def write_code_run(self, raw):
