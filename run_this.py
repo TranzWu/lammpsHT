@@ -14,11 +14,14 @@ njobs = 1
 def run(k):
     #insert preheat
     os.system(f'mkdir {k}')
+    os.system(f'cp hole.in layer_* run_this {k}')
+    os.chdir({k})
     #insert code here
-    os.system(f'change_parameter.py --input auto.in --line volume --index 8 --new {line_1[1]}')
-    os.system(f'change_parameter.py --input auto.in --line volume --index 7 --new {line_1[0]}')
-    os.system(f'change_parameter.py --input auto.in --line pressure --index 6 --new {line_0[1]}')
-    os.system(f'change_parameter.py --input auto.in --line pressure --index 5 --new {line_0[0]}')
+    os.system(f'change_parameter.py --input hole.in --line volume --index 8 --new {line_1[1]}')
+    os.system(f'change_parameter.py --input hole.in --line volume --index 7 --new {line_1[0]}')
+    os.system(f'change_parameter.py --input hole.in --line pressure --index 6 --new {line_0[1]}')
+    os.system(f'change_parameter.py --input hole.in --line pressure --index 5 --new {line_0[0]}')
     #insert post-processing
-    os.system(f'layer_1.py')
+    os.system(f'python layer_1.py')
+    os.chdir('..')
 Parallel(n_jobs=njobs)(delayed(run)(i) for i in range(N_ensemble))

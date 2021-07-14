@@ -35,12 +35,15 @@ class Parser():
 
 		for i in range(self.Nlayers):
 			layer = self.text[start[i]:end[i]]
-			layer = Layer(layer, filename=self.input, N_max=self.Nlayers)
+			layer = Layer(layer, filename=self.filename, N_max=self.Nlayers)
 			Layers.append(layer)
 
 		return Layers
 
 
+	def write_all(self):
+		for layer in self.layers:
+			layer.write_to_file()
 
 
 if __name__ == '__main__':

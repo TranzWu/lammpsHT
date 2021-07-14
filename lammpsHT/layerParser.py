@@ -84,7 +84,7 @@ class Layer(Line):
 			raw =  self.input[start+1: end]
 			return [self.reformat(line) for line in raw]
 		else:
-			return [f'layer_{self.index - 1}.py']
+			return [f'python layer_{self.index - 1}.py']
 			
 	@property
 	def template_path(self):
@@ -140,6 +140,8 @@ class Layer(Line):
 				for p in self.post:
 					text.insert(count_post, f"{b}os.system(f'{p}')\n")
 					count_post += 1
+				if not self.isFirst:
+					text.insert(count_post, f"{b}os.chdir('..')\n")
 		return text
 
 	def write_preheat(self, raw):
@@ -149,6 +151,10 @@ class Layer(Line):
 			if 'insert preheat' in line:
 				count_heat = idx + 1
 				text.insert(count_heat, f"{b}os.system(f'mkdir {{k}}')\n")
+				count_heat += 1
+				text.insert(count_heat, f"{b}os.system(f'cp {self.filename} layer_* run_this {{k}}')\n")
+				count_heat += 1
+				text.insert(count_heat, f"{b}os.chdir({{k}})\n")
 		return text
 
 	def write_code_run(self, raw):
@@ -180,8 +186,8 @@ class Layer(Line):
 						if self.isFirst:  
 							cmd_wrap = f"{b}os.system('{cmd}')\n"
 						else:
-							cmd_wrap = f"{b}os.system(f'{cmd}')"
-						text.insert(idx + 1, f'{cmd_wrap}\n')
+							cmd_wrap = f"{b}os.system(f'{cmd}')\n"
+						text.insert(idx + 1, f'{cmd_wrap}')
 						count_code += 1
 
 				if self.isFirst:
