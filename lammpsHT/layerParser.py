@@ -76,13 +76,8 @@ class Layer(Line):
 	@property
 	def post(self):
 		if self.isFirst:
-			for idx, line in enumerate(self.input):
-				if 'POST' in line:
-					start = idx
-				if 'END post' in line:
-					end = idx
-			raw =  self.input[start+1: end]
-			return [self.reformat(line) for line in raw]
+
+			return []
 		else:
 			return [f'python layer_{self.index - 1}.py']
 			
@@ -142,8 +137,8 @@ class Layer(Line):
 				for p in self.post:
 					text.insert(count_post, f"{b}os.system(f'{p}')\n")
 					count_post += 1
-				if not self.isFirst:
-					text.insert(count_post, f"{b}os.chdir('..')\n")
+				
+				text.insert(count_post, f"{b}os.chdir('..')\n")
 		return text
 
 	def write_preheat(self, raw):
@@ -177,18 +172,22 @@ class Layer(Line):
 						if self.isFirst:
 							new_prm = f"{l.parameter[i]}"
 						else:
-							new_prm = f"line_{ii}_{i}[{{k}}]"
+							new_prm = f"line_{ii}_{i}[k]"
 
+						new_var = f"{b}l_{ii}_{i}"
+
+						text.insert(count_code, f"{new_var} = {new_prm}\n")
+						count_code += 1
 						cmd = f'{temp}change_parameter.py '\
 							  f'--input {self.filename} '\
 							  f'--line {l.identifier} '\
 							  f'--index {l.index[i]} '\
-							  f'--new {new_prm}'
+							  f'--new l_{ii}_{i}'
 						if self.isFirst:  
 							cmd_wrap = f"{b}os.system('{cmd}')\n"
 						else:
 							cmd_wrap = f"{b}os.system(f'{cmd}')\n"
-						text.insert(idx + 1, f'{cmd_wrap}')
+						text.insert(count_code, f'{cmd_wrap}')
 						count_code += 1
 
 				if self.isFirst:
@@ -202,10 +201,7 @@ class Layer(Line):
 	def write_to_file(self):
 		text = self.read_from_template()
 		text = self.write_parameters(text)
-		if self.isFirst:
-			text = self.write_pre(text)
-		else:
-			text = self.write_preheat(text)
+		text = self.write_preheat(text)
 		text = self.write_code_run(text)
 		text = self.write_post(text)
 		with open(self.output, 'w') as f:

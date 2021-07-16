@@ -10,15 +10,19 @@ cores = 4
 N_ensemble = 5
 njobs = 5
 #insert pretreatment
-os.system('mkdir results')
 def run(k):
     #insert preheat
+    os.system(f'mkdir {k}')
+    os.system(f'cp hole.in layer_* run_this {k}')
+    os.chdir(f'{k}')
     #insert code here
-    os.system('change_parameter.py --input hole.in --line velocity_placeolder --index 4 --new random')
-    os.system('change_parameter.py --input hole.in --line interior --index 4 --new random')
-    os.system('change_parameter.py --input hole.in --line bulk --index 4 --new random')
+    l_0_0 = random
+    os.system('change_parameter.py --input hole.in --line bulk --index 4 --new l_0_0')
+    l_1_0 = random
+    os.system('change_parameter.py --input hole.in --line interior --index 4 --new l_1_0')
+    l_2_0 = random
+    os.system('change_parameter.py --input hole.in --line velocity_placeolder --index 4 --new l_2_0')
     os.system(f'mpirun --oversubscribe -np {cores} lmp_mpi -in hole.in > output.lammps')
     #insert post-processing
-    os.system(f'calculate.py --output result_{k}')
-    os.system(f'mv result_* results')
+    os.chdir('..')
 Parallel(n_jobs=njobs)(delayed(run)(i) for i in range(N_ensemble))

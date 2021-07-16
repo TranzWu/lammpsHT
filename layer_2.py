@@ -19,10 +19,14 @@ def run(k):
     os.system(f'cp hole.in layer_* run_this {k}')
     os.chdir(f'{k}')
     #insert code here
-    os.system(f'change_parameter.py --input hole.in --line random_stuff --index 7 --new line_1_1[{k}]')
-    os.system(f'change_parameter.py --input hole.in --line random_stuff --index 4 --new line_1_0[{k}]')
-    os.system(f'change_parameter.py --input hole.in --line initial_fluid --index 6 --new line_0_1[{k}]')
-    os.system(f'change_parameter.py --input hole.in --line initial_fluid --index 5 --new line_0_0[{k}]')
+    l_0_0 = line_0_0[k]
+    os.system(f'change_parameter.py --input hole.in --line initial_fluid --index 5 --new l_0_0')
+    l_0_1 = line_0_1[k]
+    os.system(f'change_parameter.py --input hole.in --line initial_fluid --index 6 --new l_0_1')
+    l_1_0 = line_1_0[k]
+    os.system(f'change_parameter.py --input hole.in --line random_stuff --index 4 --new l_1_0')
+    l_1_1 = line_1_1[k]
+    os.system(f'change_parameter.py --input hole.in --line random_stuff --index 7 --new l_1_1')
     #insert post-processing
     os.system(f'python layer_1.py')
     os.chdir('..')

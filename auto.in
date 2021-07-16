@@ -10,10 +10,6 @@ N = 1 START
     njobs 5
     use_template 0
 
-    PRE 
-        mkdir results
-    END pre
-
 
     Line bulk 1
         index 4
@@ -29,12 +25,6 @@ N = 1 START
         index 4
         parameter random
     END line
-
-
-    POST
-        calculate.py --output result_{k}
-        mv result_* results
-    END post
 
 
     
