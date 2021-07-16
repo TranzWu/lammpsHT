@@ -1,5 +1,5 @@
 # lammpsHT
-A python package way for systematically running lammps simulation (or any scientific software) in a high throughput manner
+A python package way for systematically running Lammps simulation in a high throughput manner
 
 The information required to generate the automization code
 =================================================================================================================================
