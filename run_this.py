@@ -17,7 +17,7 @@ def run(k):
     os.chdir(f'{k}')
     #insert code here
     l_0_0 = line_0_0[k]
-    os.system(f'change_parameter.py --input hole.in --line pressure --index 4 --new l_0_0')
+    os.system(f'change_parameter.py --input hole.in --line pressure --index 4 --new {l_0_0}')
     #insert post-processing
     os.system(f'python layer_2.py')
     os.chdir('..')

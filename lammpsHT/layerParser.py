@@ -149,7 +149,7 @@ class Layer(Line):
 				count_heat = idx + 1
 				text.insert(count_heat, f"{b}os.system(f'mkdir {{k}}')\n")
 				count_heat += 1
-				text.insert(count_heat, f"{b}os.system(f'cp {self.filename} layer_* run_this {{k}}')\n")
+				text.insert(count_heat, f"{b}os.system(f'cp {self.filename} layer_* run_this* {{k}}')\n")
 				count_heat += 1
 				text.insert(count_heat, f"{b}os.chdir(f'{{k}}')\n")
 		return text
@@ -170,7 +170,7 @@ class Layer(Line):
 							temp = ''
 
 						if self.isFirst:
-							new_prm = f"{l.parameter[i]}"
+							new_prm = f"'{l.parameter[i]}'"
 						else:
 							new_prm = f"line_{ii}_{i}[k]"
 
@@ -178,15 +178,13 @@ class Layer(Line):
 
 						text.insert(count_code, f"{new_var} = {new_prm}\n")
 						count_code += 1
+						new_str = '{' + f'l_{ii}_{i}' + '}'
 						cmd = f'{temp}change_parameter.py '\
 							  f'--input {self.filename} '\
 							  f'--line {l.identifier} '\
 							  f'--index {l.index[i]} '\
-							  f'--new l_{ii}_{i}'
-						if self.isFirst:  
-							cmd_wrap = f"{b}os.system('{cmd}')\n"
-						else:
-							cmd_wrap = f"{b}os.system(f'{cmd}')\n"
+							  f'--new {new_str}'
+						cmd_wrap = f"{b}os.system(f'{cmd}')\n"
 						text.insert(count_code, f'{cmd_wrap}')
 						count_code += 1
 

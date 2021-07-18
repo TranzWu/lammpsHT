@@ -1,4 +1,4 @@
-#!/home/chunzhiw/anaconda3/bin/python
+#!/opt/anaconda3/bin/python
 import argparse
 import numpy as np
 import random
