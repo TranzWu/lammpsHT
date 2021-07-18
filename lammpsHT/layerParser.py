@@ -149,7 +149,7 @@ class Layer(Line):
 				count_heat = idx + 1
 				text.insert(count_heat, f"{b}os.system(f'mkdir layer{self.index}_{{k}}')\n")
 				count_heat += 1
-				text.insert(count_heat, f"{b}os.system(f'cp {self.filename} layer_* run_this* {{k}}')\n")
+				text.insert(count_heat, f"{b}os.system(f'cp {self.filename} layer_* run_this* layer{self.index}_{{k}}')\n")
 				count_heat += 1
 				text.insert(count_heat, f"{b}os.chdir(f'layer{self.index}_{{k}}')\n")
 		return text
