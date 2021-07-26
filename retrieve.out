@@ -1,0 +1,24 @@
+#Collect the simulation results
+
+Nlayers 3
+is_current_highest 1
+file_to_read dump.crack
+
+Columns ['pressure', 'hole_distance', 'fluid_content', 'random_seed']
+
+
+Library 
+
+    from toy_model.three_D import Effusion
+
+End library
+
+
+Code
+
+    eff = Effusion(f'{path}')
+    eff.run()
+
+End code
+
+Data eff.effusion
