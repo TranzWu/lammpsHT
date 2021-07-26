@@ -96,15 +96,19 @@ class Parser(Layer):
 		b = '    '
 		b_max = b * self.Nlayers
 		text.append("path = ''\n")
+		text.append('df = {}\n')
 		for i in range(self.Nlayers):
+
 			if i != self.Nlayers - 1:
 				text.append(f'{i*b}for layer{self.Nlayers-i} in range(len(layer_{self.Nlayers - i})):\n')
 				l = '{layer' + f'{self.Nlayers-i}' + '}'
 				text.append(f"{(i+1)*b}path = path + f'layer{self.Nlayers-i}_{l}/'\n")
+				text.append(f"{(i+1)*b}df[Columns[layer{self.Nlayers-i}] = [layer_{self.Nlayers-i}[layer{self.Nlayers-i}]]]\n")
 			else:
 				text.append(f'{i*b}for layer{self.Nlayers-i} in range(layer_{self.Nlayers - i}):\n')
 				l = '{layer' + f'{self.Nlayers-i}' + '}'
 				text.append(f"{(i+1)*b}path = path + f'layer{self.Nlayers-i}_{l}/{self.file_to_read}'\n")
+				text.append(f"{(i+1)*b}df[Columns[layer{self.Nlayers-i}] = [layer{self.Nlayers-i}]]\n")
 		
 				text.append(f'{b_max}try:\n')
 				for c in self.Code:
