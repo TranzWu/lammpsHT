@@ -29,7 +29,10 @@ class Parser(Layer):
 			if 'Columns' in line:
 				return self.reformat(line.split('Columns')[-1])
 
-
+	@property
+	def Ncolumns(self):
+		col = eval(self.Columns)
+		return len(col)
 
 	def split_euqal_sign(self, text):
 		return self.reformat(text.split(" = ")[-1])
@@ -75,6 +78,16 @@ class Parser(Layer):
 		code = [self.reformat(l) for l in code]
 		return [l for l in code if l]
 
+	@property
+	def Data_object(self):
+		for line in self.input:
+			if 'Data_object' in line:
+				return line.split()[-1]
+
+	@property
+	def Data_dimension(self):
+		return self.key_value('Data_dimension')
+
 	def write_library(self, text):
 		text.append('import numpy as np\n')
 		text.append('from pandas import DataFrame\n')
@@ -84,12 +97,19 @@ class Parser(Layer):
 		return text
 
 	def write_parameters(self, text):
+		sum_jobs = 1
 		for i in range(self.Nlayers):
 			text.append(f'layer_{i+1} = {self.parameters[i+1]}\n')
+			if i == 0:
+				sum_jobs = sum_jobs * int(self.parameters[1])
+			else:
+				sum_jobs = sum_jobs * len(eval(self.parameters[i+1]))
 
 		text.append(f'Columns = {self.Columns}\n')
 		text.append(f'DF = DataFrame(columns=Columns)\n')
+		text.append(f'total_jobs = {sum_jobs}\n')
 		text.append('\n')
+
 		return text
 
 	def write_for_loop(self, text):
@@ -97,23 +117,40 @@ class Parser(Layer):
 		b_max = b * self.Nlayers
 		text.append("path = ''\n")
 		text.append('df = {}\n')
+		text.append('count = 0\n')
+		path = ''
 		for i in range(self.Nlayers):
 
 			if i != self.Nlayers - 1:
 				text.append(f'{i*b}for layer{self.Nlayers-i} in range(len(layer_{self.Nlayers - i})):\n')
 				l = '{layer' + f'{self.Nlayers-i}' + '}'
-				text.append(f"{(i+1)*b}path = path + f'layer{self.Nlayers-i}_{l}/'\n")
-				text.append(f"{(i+1)*b}df[Columns[layer{self.Nlayers-i}] = [layer_{self.Nlayers-i}[layer{self.Nlayers-i}]]]\n")
+				path = f'{path}layer{self.Nlayers-i}_{l}/'
+				#text.append(f"{(i+1)*b}path = path + f'layer{self.Nlayers-i}_{l}/'\n")
+				text.append(f"{(i+1)*b}df[Columns[{i}]] = [layer_{self.Nlayers-i}[layer{self.Nlayers-i}]]\n")
 			else:
 				text.append(f'{i*b}for layer{self.Nlayers-i} in range(layer_{self.Nlayers - i}):\n')
 				l = '{layer' + f'{self.Nlayers-i}' + '}'
-				text.append(f"{(i+1)*b}path = path + f'layer{self.Nlayers-i}_{l}/{self.file_to_read}'\n")
-				text.append(f"{(i+1)*b}df[Columns[layer{self.Nlayers-i}] = [layer{self.Nlayers-i}]]\n")
+				text.append(f"{b_max}path = f'{path}layer1_{l}/{self.file_to_read}'\n")
+				text.append(f"{(i+1)*b}df[Columns[{i}]] = [layer{self.Nlayers-i}]\n")
 		
 				text.append(f'{b_max}try:\n')
 				for c in self.Code:
 					text.append(f'{b_max}{b}{c}\n')
-
+				if self.Data_dimension == 1:
+					text.append(f'{b_max}{b}df[Columns[-1]] = {self.Data_object}\n')
+				if self.Data_dimension == 2:
+					text.append(f'{b_max}{b}for i in range(len({self.Data_object})):\n')
+					text.append(f'{b_max}{b}{b}dff = df.copy()\n')
+					text.append(f'{b_max}{b}{b}dff[Columns[-2]] = [i]\n')
+					text.append(f'{b_max}{b}{b}dff[Columns[-1]] = [{self.Data_object}[i]]\n')
+				text.append(f'{b_max}{b}{b}dff = DataFrame(dff)\n')
+				text.append(f'{b_max}{b}{b}DF = DF.append(dff)\n')
+				text.append(f'{b_max}{b}count += 1\n')
+				text.append(f'{b_max}{b}print(f"current progress: {{count/total_jobs * 100:.2f}}%", end="\\r")\n')
+				text.append(f'{b_max}except OSError:\n')
+				text.append(f'{b_max}{b}print(f"Cannot open file: {{path}}\\n")\n')
+		text.append(f"{b}path = ''\n")
+		text.append('DF.to_csv("data", index=False)\n')
 		return text
 
 

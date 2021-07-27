@@ -1,10 +1,10 @@
 #Collect the simulation results
 
-Nlayers 3
+Nlayers 4
 is_current_highest 1
 file_to_read dump.crack
 
-Columns ['pressure', 'hole_distance', 'fluid_content', 'random_seed']
+Columns ['pressure', 'hole_distance', 'fluid_content', 'random_seed', 'timestep', 'weight_loss']
 
 
 Library 
@@ -21,4 +21,5 @@ Code
 
 End code
 
-Data eff.effusion
+Data_object eff.effusion
+Data_dimension 2

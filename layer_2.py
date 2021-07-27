@@ -6,27 +6,18 @@ from joblib import Parallel, delayed
 import sys
 import numpy as np
 #insert parameters here
-line_0_0 = [-0.1, -1.0, -1.5, -2, -2.5, -3]
-line_0_1 = [-0.2, -1.0, -1.5, -2, -2.5, -3]
-line_1_0 = [-0.3, -1.0, -1.5, -2, -2.5, -3]
-line_1_1 = [-0.4, -1.0, -1.5, -2, -2.5, -3]
-N_ensemble = 6
-njobs = 1
+line_0_0 = [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]
+N_ensemble = 10
+njobs = 5
 #insert pretreatment
 def run(k):
     #insert preheat
-    os.system(f'mkdir {k}')
-    os.system(f'cp hole.in layer_* run_this* {k}')
-    os.chdir(f'{k}')
+    os.system(f'mkdir layer2_{k}')
+    os.system(f'cp piston.in layer_* run_this* layer2_{k}')
+    os.chdir(f'layer2_{k}')
     #insert code here
     l_0_0 = line_0_0[k]
-    os.system(f'change_parameter.py --input hole.in --line initial_fluid --index 5 --new {l_0_0}')
-    l_0_1 = line_0_1[k]
-    os.system(f'change_parameter.py --input hole.in --line initial_fluid --index 6 --new {l_0_1}')
-    l_1_0 = line_1_0[k]
-    os.system(f'change_parameter.py --input hole.in --line random_stuff --index 4 --new {l_1_0}')
-    l_1_1 = line_1_1[k]
-    os.system(f'change_parameter.py --input hole.in --line random_stuff --index 7 --new {l_1_1}')
+    os.system(f'change_parameter.py --input piston.in --line interior --index 3 --new {l_0_0}')
     #insert post-processing
     os.system(f'python layer_1.py')
     os.chdir('..')

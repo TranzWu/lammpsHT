@@ -1,58 +1,61 @@
-#The information required to generate automization code
-
-Filename hole.in
-N_layers 3
-
+Filename piston.in
+N_layers 4
 N = 1 START
 
-    N_ensemble 5
+    N_ensemble 10
     cores 4
-    njobs 5
+    njobs 2
     use_template 0
 
-
     Line bulk 1
-        index 4
-        parameter random
+    index 4
+    parameter random
     END line
 
     Line interior 1
-        index 4
-        parameter random
+     index 4
+     parameter random
     END line
 
-    Line velocity_placeolder 1
-        index 4
-        parameter random
+    Line velocity_placeholder 1
+         index 4
+     parameter random
     END line
 
-
-    
 END layer
 
 N = 2 START
-    njobs 1
-    Line initial_fluid 2
-        index 5
-        parameter [-0.1, -1.0, -1.5, -2, -2.5, -3] 
-        index 6
-        parameter [-0.2, -1.0, -1.5, -2, -2.5, -3]
-    END line
 
-    Line random_stuff 2
-        index 4
-        parameter [-0.3, -1.0, -1.5, -2, -2.5, -3] 
-        index 7
-        parameter [-0.4, -1.0, -1.5, -2, -2.5, -3] 
+    njobs 5
+
+    Line interior 1
+     index 3
+     parameter [200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000]
     END line
 
 END layer
 
 N = 3 START
-    njobs 3
-    Line pressure 1
-        index 4
-        parameter [0, 1, 2, 3, 4]
+
+    njobs 2
+
+    Line hole_up 2
+     index 3
+     parameter [5, 7, 9, 11, 13, 15, 17, 19]
+
+     index 4
+     parameter [5, 7, 9, 11, 13, 15, 17, 19]
+    END line
+
+END layer
+
+N = 4 START
+
+    njobs 1
+
+    Line fp_pressure 1
+     index 6
+     parameter [-5, -7, -9]
     END line
 
 END layer
