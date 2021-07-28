@@ -26,8 +26,9 @@ for layer4 in range(len(layer_4)):
                     eff = Effusion(f'{path}')
                     eff.run()
                     df[Columns[-1]] = [eff.effusion_rate]
-                    df = DataFrame(df)
-                    DF = DF.append(df)
+                    dff = df.copy()
+                    dff = DataFrame(dff)
+                    DF = DF.append(dff)
                     count += 1
                     print(f"current progress: {count/total_jobs * 100:.2f}%", end="\r")
                 except OSError:
