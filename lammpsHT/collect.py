@@ -135,7 +135,7 @@ class Parser(Layer):
 		
 				text.append(f'{b_max}try:\n')
 				for c in self.Code:
-					text.append(f'{b_max}{b}{c}\n')
+					text.append(f'{b_max}{b}{c}\n')   #
 				if self.Data_dimension == 1:
 					text.append(f'{b_max}{b}df[Columns[-1]] = {self.Data_object}\n')
 				if self.Data_dimension == 2:
