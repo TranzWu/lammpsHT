@@ -135,16 +135,17 @@ class Parser(Layer):
 		
 				text.append(f'{b_max}try:\n')
 				for c in self.Code:
-					text.append(f'{b_max}{b}{c}\n')   #
+					text.append(f'{b_max}{b}{c}\n')   
 				if self.Data_dimension == 1:
 					text.append(f'{b_max}{b}df[Columns[-1]] = {self.Data_object}\n')
+					text.append(f'{b_max}{b}DF = DF.append(df)\n')
 				if self.Data_dimension == 2:
 					text.append(f'{b_max}{b}for i in range(len({self.Data_object})):\n')
 					text.append(f'{b_max}{b}{b}dff = df.copy()\n')
 					text.append(f'{b_max}{b}{b}dff[Columns[-2]] = [i]\n')
 					text.append(f'{b_max}{b}{b}dff[Columns[-1]] = [{self.Data_object}[i]]\n')
-				text.append(f'{b_max}{b}{b}dff = DataFrame(dff)\n')
-				text.append(f'{b_max}{b}{b}DF = DF.append(dff)\n')
+					text.append(f'{b_max}{b}{b}dff = DataFrame(dff)\n')
+					text.append(f'{b_max}{b}{b}DF = DF.append(dff)\n')
 				text.append(f'{b_max}{b}count += 1\n')
 				text.append(f'{b_max}{b}print(f"current progress: {{count/total_jobs * 100:.2f}}%", end="\\r")\n')
 				text.append(f'{b_max}except OSError:\n')
